@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Nature Scene with Rotating Objects</title>
+    <style>
+        body { margin: 0; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        scene.background = new THREE.Color(0x87CEEB);
+
+        const grassGeometry = new THREE.PlaneGeometry(100, 100);
+        const grassMaterial = new THREE.MeshBasicMaterial({ color: 0x00FF00, side: THREE.DoubleSide });
+        const grass = new THREE.Mesh(grassGeometry, grassMaterial);
+        grass.rotation.x = Math.PI / 2;
+        scene.add(grass);
+
+        const rotatingObjects = [];
+
+        function createBlock(x, y, z) {
+            const blockGeometry = new THREE.BoxGeometry(1, 1, 1);
+            const blockMaterial = new THREE.MeshBasicMaterial({ color: 0xA0522D });
+            const block = new THREE.Mesh(blockGeometry, blockMaterial);
+            block.position.set(x, y, z);
+            scene.add(block);
+            rotatingObjects.push(block);
+        }
+
+        createBlock(-2, 0.5, -2);
+        createBlock(0, 0.5, -3);
+        createBlock(2, 0.5, -1);
+
+        function createAnimal(x, y, z, color) {
+            const animalGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const animalMaterial = new THREE.MeshBasicMaterial({ color: color });
+            const animal = new THREE.Mesh(animalGeometry, animalMaterial);
+            animal.position.set(x, y, z);
+            scene.add(animal);
+            rotatingObjects.push(animal);
+        }
+
+        createAnimal(-3, 0.5, 0, 0xFFFFFF);
+        createAnimal(3, 0.5, 2, 0x8B4513);
+
+        camera.position.set(0, 5, 10);
+        camera.lookAt(0, 0, 0);
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            // Rotate all objects
+            rotatingObjects.forEach((object, index) => {
+                object.rotation.y += 0.02 * (index + 1);
+                object.rotation.x += 0.01 * (index + 1);
+            });
+
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>
